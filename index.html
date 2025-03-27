@@ -55,6 +55,10 @@
       color: #f0f0f0;
     }
 
+    .card:last-child {
+      box-shadow: 0 8px 20px rgba(0,0,0,0.25);
+    }
+
     .end-message {
       font-size: 20px;
       color: #1A1A1A;
@@ -92,6 +96,8 @@
     const card = document.createElement("div");
     card.className = "card";
     card.style.background = scent.gradient;
+    card.style.zIndex = scents.length - i; // Top card is on top
+    card.style.transform = `translateY(${i * 2}px)`; // Subtle stack effect
     card.dataset.id = i + 1;
     card.dataset.name = scent.name;
     card.innerHTML = `<h2>${scent.name}</h2><p>${scent.notes}</p>`;
