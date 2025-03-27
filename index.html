@@ -32,7 +32,7 @@
       padding: 24px;
       display: flex;
       flex-direction: column;
-      justify-content: flex-end;
+      justify-content: center;
       align-items: center;
       text-align: center;
       transition: transform 0.3s ease, opacity 0.3s ease;
@@ -46,12 +46,14 @@
     }
 
     .card h2 {
-      font-size: 22px;
-      margin-bottom: 8px;
+      font-size: 24px;
+      margin-bottom: 16px;
     }
 
     .card p {
-      font-size: 14px;
+      font-size: 15px;
+      max-width: 260px;
+      line-height: 1.4;
       color: #f0f0f0;
     }
 
@@ -74,18 +76,28 @@
   const scents = [
     {
       name: "Ocean Drift",
-      notes: "Sea salt & sage on coastal driftwood",
+      notes: "A refreshing sea breeze wrapped in coastal sage and aged driftwood. Perfect for clearing the mind and calming the senses.",
       gradient: "linear-gradient(to top right, #2E8B92, #B6D348)"
     },
     {
       name: "Vanilla Ember",
-      notes: "Smoky vanilla bean and soft amber",
+      notes: "Warm vanilla bean toasted over smoky embers, blended with amber and soft musk for cozy evenings in.",
       gradient: "linear-gradient(to top right, #F88C6E, #F5793B)"
     },
     {
       name: "Bushwalk Breeze",
-      notes: "Eucalyptus, lemon myrtle & sandalwood",
+      notes: "A walk through native bush — eucalyptus, lemon myrtle, and earthy sandalwood swirl together for an invigorating scent.",
       gradient: "linear-gradient(to top right, #A07FA2, #2E8B92)"
+    },
+    {
+      name: "Coconut Cloud",
+      notes: "Light coconut milk whipped with soft vanilla and spun sugar. Feels like lying under the sun with no worries in the world.",
+      gradient: "linear-gradient(to top right, #F5D5D5, #FBC3BC)"
+    },
+    {
+      name: "Cedar Nights",
+      notes: "Deep cedarwood, crushed clove, and warm tonka bean blend into a rich, grounding scent that lingers in the best way.",
+      gradient: "linear-gradient(to top right, #1A1A1A, #B0B0B0)"
     }
   ];
 
@@ -96,8 +108,8 @@
     const card = document.createElement("div");
     card.className = "card";
     card.style.background = scent.gradient;
-    card.style.zIndex = scents.length - i; // Top card is on top
-    card.style.transform = `translateY(${i * 2}px)`; // Subtle stack effect
+    card.style.zIndex = scents.length - i;
+    card.style.transform = `translateY(${i * 2}px)`;
     card.dataset.id = i + 1;
     card.dataset.name = scent.name;
     card.innerHTML = `<h2>${scent.name}</h2><p>${scent.notes}</p>`;
