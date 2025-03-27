@@ -78,17 +78,15 @@
     .then(res => res.text())
     .then(csv => {
       const rows = csv.trim().split("\n").slice(1); // skip header
-const products = rows.map(row => {
-  const cols = row.split(/,(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)/);
-  return {
-    id: cols[0],
-    name: cols[1],
-    notes: (cols[6] || 'No description available').replace(/<[^>]+>/g, '').substring(0, 100) + '...',
-    image: cols[27] || ''
-  };
-}).filter(p => p.name && p.image);
-
-      }).reverse();
+      const products = rows.map(row => {
+        const cols = row.split(/,(?=(?:[^"]*"[^"]*")*[^"]*$)/);
+        return {
+          id: cols[0],
+          name: cols[1],
+          notes: (cols[6] || 'No description available').replace(/<[^>]+>/g, '').substring(0, 100) + '...',
+          image: cols[27] || ''
+        };
+      }).filter(p => p.name && p.image);
 
       const tinder = document.getElementById("tinder");
       tinder.innerHTML = "";
