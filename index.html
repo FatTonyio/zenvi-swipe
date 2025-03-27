@@ -1,81 +1,3 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>Zenvi Swipe Demo</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
-  <style>
-    body {
-      margin: 0;
-      background: #E5D5C3;
-      font-family: 'Inter', sans-serif;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      overflow: hidden;
-    }
-
-    #tinder {
-      position: relative;
-      width: 320px;
-      height: 480px;
-    }
-
-    .card {
-      position: absolute;
-      width: 100%;
-      height: 100%;
-      background-size: cover;
-      background-position: center;
-      border-radius: 20px;
-      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
-      color: white;
-      padding: 24px;
-      display: flex;
-      flex-direction: column;
-      justify-content: flex-end;
-      align-items: center;
-      text-align: center;
-      transition: transform 0.3s ease, opacity 0.3s ease;
-      user-select: none;
-    }
-
-    .card::after {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(to top, rgba(0,0,0,0.5), rgba(0,0,0,0));
-      border-radius: 20px;
-      z-index: 0;
-    }
-
-    .card h2, .card p {
-      z-index: 1;
-      margin: 0;
-    }
-
-    .card h2 {
-      font-size: 22px;
-      margin-bottom: 8px;
-    }
-
-    .card p {
-      font-size: 14px;
-      color: #f0f0f0;
-    }
-
-    .end-message {
-      font-size: 20px;
-      color: #1A1A1A;
-      text-align: center;
-    }
-  </style>
-</head>
-<body>
-
-<div id="tinder"></div>
-
 <script>
   const scents = [
     {
@@ -95,18 +17,25 @@
     }
   ];
 
+  const SHEETDB_URL = "https://sheetdb.io/api/v1/1ihsui12t3ue1";
   const tinder = document.getElementById("tinder");
-  const results = [];
 
   scents.slice().reverse().forEach((scent, i) => {
-    const card = document.createElement("div");
-    card.className = "card";
-    card.style.backgroundImage = `url('https://source.unsplash.com/600x800/?${scent.imageQuery}')`;
-    card.dataset.id = i + 1;
-    card.dataset.name = scent.name;
-    card.innerHTML = `<h2>${scent.name}</h2><p>${scent.notes}</p>`;
-    tinder.appendChild(card);
-    addSwipeBehavior(card);
+    const img = new Image();
+    img.onload = () => {
+      const card = document.createElement("div");
+      card.className = "card";
+      card.style.backgroundImage = `url('${img.src}')`;
+      card.dataset.id = i + 1;
+      card.dataset.name = scent.name;
+      card.innerHTML = `<h2>${scent.name}</h2><p>${scent.notes}</p>`;
+      tinder.appendChild(card);
+      addSwipeBehavior(card);
+    };
+    img.onerror = () => {
+      console.warn(`❌ Failed to load image for: ${scent.name}`);
+    };
+    img.src = `https://source.unsplash.com/600x800/?${scent.imageQuery}`;
   });
 
   function addSwipeBehavior(card) {
@@ -170,16 +99,30 @@
   function handleSwipe(card, dir) {
     const name = card.dataset.name;
     const opinion = dir === "right" ? "like" : "dislike";
-    results.push({ name, opinion, timestamp: new Date().toISOString() });
+    const data = {
+      name,
+      opinion,
+      timestamp: new Date().toISOString()
+    };
 
+    sendToSheet(data);
     card.remove();
 
     if (!document.querySelector(".card")) {
-      tinder.innerHTML = `<div class="end-message">Thanks for swiping!<br>Check your data sheet 🕯️</div>`;
-      console.log("Swipes:", results);
+      tinder.innerHTML = `<div class="end-message">Thanks for swiping!<br>Your opinions have been saved 🕯️</div>`;
     }
   }
-</script>
 
-</body>
-</html>
+  function sendToSheet(data) {
+    fetch(SHEETDB_URL, {
+      method: "POST",
+      body: JSON.stringify({ data }),
+      headers: {
+        "Content-Type": "application/json"
+      }
+    })
+    .then(res => res.json())
+    .then(res => console.log("✅ Logged to SheetDB:", res))
+    .catch(err => console.error("❌ Error:", err));
+  }
+</script>
