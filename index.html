@@ -72,23 +72,34 @@
 
 <script>
   const SHEETDB_URL = "https://sheetdb.io/api/v1/1ihsui12t3ue1";
+  const CSV_URL = "products_export_1.csv";
 
-  fetch("https://zenvi.com.au/products.json")
-    .then(res => res.json())
-    .then(data => {
-      const products = data.products.slice(0, 15).reverse();
+  fetch(CSV_URL)
+    .then(res => res.text())
+    .then(csv => {
+      const rows = csv.trim().split("\n").slice(1); // skip header
+      const products = rows.map(row => {
+        const cols = row.split(/,(?=(?:[^"]*"[^"]*")*[^"]*$)/); // handles commas inside quotes
+        return {
+          id: cols[0],
+          name: cols[1],
+          notes: cols[6].replace(/<[^>]+>/g, '').substring(0, 100) + '...', // Body (HTML)
+          image: cols[27] // Image Src
+        };
+      }).reverse();
+
       const tinder = document.getElementById("tinder");
       tinder.innerHTML = "";
 
       products.forEach(product => {
         const card = document.createElement("div");
         card.className = "card";
-        card.dataset.title = product.title;
-        card.dataset.notes = product.body_html.replace(/<[^>]+>/g, '').substring(0, 100) + '...';
+        card.dataset.title = product.name;
+        card.dataset.notes = product.notes;
         card.innerHTML = `
-          <img src="${product.images[0]?.src}" alt="${product.title}">
-          <h2>${product.title}</h2>
-          <p>${card.dataset.notes}</p>
+          <img src="${product.image}" alt="${product.name}">
+          <h2>${product.name}</h2>
+          <p>${product.notes}</p>
         `;
         tinder.appendChild(card);
         addSwipeBehavior(card);
