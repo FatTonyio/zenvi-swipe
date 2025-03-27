@@ -62,47 +62,44 @@
       text-align: center;
     }
 
-.label {
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-  font-family: 'Lobster', cursive;
-  font-size: 28px;
-  color: #1A1A1A;
-  opacity: 0.15;
-  user-select: none;
-  pointer-events: none;
-  white-space: nowrap;
-  text-shadow: 0 0 4px rgba(255,255,255,0.2);
-}
+    .swipe-labels {
+      position: absolute;
+      bottom: 30px;
+      width: 320px;
+      display: flex;
+      justify-content: space-between;
+      padding: 0 24px;
+      font-family: 'Lobster', cursive;
+      font-size: 22px;
+      color: #1A1A1A;
+      opacity: 0.6;
+      user-select: none;
+      pointer-events: none;
+    }
 
-.label.left {
-  left: -60px;
-  transform: rotate(-15deg) translateY(-50%);
-}
+    .swipe-left {
+      text-align: left;
+    }
 
-.label.right {
-  right: -60px;
-  transform: rotate(15deg) translateY(-50%);
-}
+    .swipe-right {
+      text-align: right;
+    }
 
-@media (max-width: 400px) {
-  .label.left {
-    left: -45px;
-  }
-  .label.right {
-    right: -45px;
-  }
-}
-ransform: rotate(20deg) translateY(-50%);
+    @media (max-width: 400px) {
+      .swipe-labels {
+        font-size: 20px;
+        bottom: 24px;
+      }
     }
   </style>
 </head>
 <body>
 
-  <div class="label left">Scrap it</div>
-  <div class="label right">Love it</div>
   <div id="tinder"></div>
+  <div class="swipe-labels">
+    <span class="swipe-left">👈 Scrap it</span>
+    <span class="swipe-right">Love it 👉</span>
+  </div>
 
 <script>
   const scents = [
