@@ -19,8 +19,8 @@
 
     #tinder {
       position: relative;
-      width: 320px;
-      height: 480px;
+      width: 340px;
+      height: 520px;
     }
 
     .card {
@@ -30,23 +30,33 @@
       background: white;
       border-radius: 20px;
       box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
-      padding: 24px;
+      padding: 16px;
       text-align: center;
       cursor: grab;
       transition: transform 0.3s ease, opacity 0.3s ease;
       user-select: none;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .card img {
+      width: 100%;
+      height: 260px;
+      object-fit: cover;
+      border-radius: 16px;
     }
 
     .card h2 {
-      margin-top: 60px;
-      font-size: 24px;
+      font-size: 20px;
       color: #1A1A1A;
+      margin: 12px 0 4px;
     }
 
     .card p {
-      margin-top: 12px;
-      color: #666;
       font-size: 14px;
+      color: #555;
+      margin: 0;
     }
 
     .end-message {
@@ -58,26 +68,32 @@
 </head>
 <body>
 
-<div id="tinder"></div>
+<div id="tinder">Loading scents...</div>
 
 <script>
-  const scents = [
-    { id: 1, name: "Ocean Drift", notes: "Sea Salt, Sage, Driftwood" },
-    { id: 2, name: "Vanilla Ember", notes: "Vanilla Bean, Smoked Wood, Amber" },
-    { id: 3, name: "Bushwalk Breeze", notes: "Eucalyptus, Lemon Myrtle, Sandalwood" }
-  ];
+  const SHEETDB_URL = "https://sheetdb.io/api/v1/1ihsui12t3ue1";
 
-  const tinder = document.getElementById("tinder");
-  const results = [];
+  fetch("https://zenvi.com.au/products.json")
+    .then(res => res.json())
+    .then(data => {
+      const products = data.products.slice(0, 15).reverse();
+      const tinder = document.getElementById("tinder");
+      tinder.innerHTML = "";
 
-  scents.slice().reverse().forEach((scent) => {
-    const card = document.createElement("div");
-    card.className = "card";
-    card.dataset.id = scent.id;
-    card.innerHTML = `<h2>${scent.name}</h2><p>${scent.notes}</p>`;
-    tinder.appendChild(card);
-    addSwipeBehavior(card);
-  });
+      products.forEach(product => {
+        const card = document.createElement("div");
+        card.className = "card";
+        card.dataset.title = product.title;
+        card.dataset.notes = product.body_html.replace(/<[^>]+>/g, '').substring(0, 100) + '...';
+        card.innerHTML = `
+          <img src="${product.images[0]?.src}" alt="${product.title}">
+          <h2>${product.title}</h2>
+          <p>${card.dataset.notes}</p>
+        `;
+        tinder.appendChild(card);
+        addSwipeBehavior(card);
+      });
+    });
 
   function addSwipeBehavior(card) {
     let isDragging = false;
@@ -110,56 +126,27 @@
         card.style.transform = `translateX(0px) rotate(0deg)`;
       }
     });
-
-    // Touch support
-    card.addEventListener("touchstart", (e) => {
-      isDragging = true;
-      startX = e.touches[0].clientX;
-      card.style.transition = "none";
-    });
-
-    card.addEventListener("touchmove", (e) => {
-      if (!isDragging) return;
-      currentX = e.touches[0].clientX - startX;
-      card.style.transform = `translateX(${currentX}px) rotate(${currentX / 15}deg)`;
-    });
-
-    card.addEventListener("touchend", () => {
-      if (!isDragging) return;
-      isDragging = false;
-      card.style.transition = "transform 0.3s ease";
-
-      if (Math.abs(currentX) > 120) {
-        const direction = currentX > 0 ? "right" : "left";
-        card.style.transform = `translateX(${currentX * 4}px) rotate(${currentX / 2}deg)`;
-        setTimeout(() => {
-          handleSwipe(card, direction);
-        }, 300);
-      } else {
-        card.style.transform = `translateX(0px) rotate(0deg)`;
-      }
-    });
   }
 
   function handleSwipe(card, dir) {
-    const id = parseInt(card.dataset.id);
-    const scent = scents.find(s => s.id === id);
-    const opinion = dir === "right" ? "like" : "dislike";
-    const entry = { ...scent, opinion };
-    results.push(entry);
-    sendToSheet(entry);
+    const scent = {
+      id: Date.now(),
+      name: card.dataset.title,
+      notes: card.dataset.notes,
+      opinion: dir === "right" ? "like" : "dislike",
+      timestamp: new Date().toISOString()
+    };
+
+    sendToSheet(scent);
     card.remove();
 
     if (!document.querySelector(".card")) {
-      tinder.innerHTML = `<div class="end-message">Thanks for swiping!<br>Check your Google Sheet 🧼</div>`;
-      console.log("Swipe Results:", results);
+      document.getElementById("tinder").innerHTML = `<div class="end-message">Thanks for swiping!<br>Your preferences have been noted 🕯️</div>`;
     }
   }
 
   function sendToSheet(data) {
-    data.timestamp = new Date().toISOString(); // Add timestamp
-
-    fetch("https://sheetdb.io/api/v1/1ihsui12t3ue1", {
+    fetch(SHEETDB_URL, {
       method: "POST",
       body: JSON.stringify({ data }),
       headers: {
