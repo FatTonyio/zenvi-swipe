@@ -1,123 +1,180 @@
-<script>
-  window.onload = () => {
-
-    const CSV_URL = 'https://raw.githubusercontent.com/fattonyio/zenvi-swipe/main/products_export_1.csv';
-    const SHEETDB_URL = 'https://sheetdb.io/api/v1/1ihsui12t3ue1';
-
-    const tinder = document.getElementById("tinder");
-    const results = [];
-
-    fetch(CSV_URL)
-      .then(res => res.text())
-      .then(csv => {
-        const rows = csv.trim().split('\n').slice(1); // Skip header
-        const titles = rows.map(row => {
-          const cols = row.split(/,(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)/);
-          return cols[1]; // Column 1 = "Title"
-        }).filter(title => title && title !== "Title");
-
-        loadCards(titles);
-      });
-
-    function loadCards(titles) {
-      titles.reverse().forEach((title, index) => {
-        const card = document.createElement("div");
-        card.className = "card";
-        card.dataset.id = index + 1;
-        card.dataset.name = title;
-        card.innerHTML = `<h2>${title}</h2>`;
-        tinder.appendChild(card);
-        addSwipeBehavior(card);
-      });
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Zenvi Scent Swipe</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet" />
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background: #E5D5C3;
+      font-family: 'Inter', sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      overflow: hidden;
     }
 
-    function addSwipeBehavior(card) {
-      let isDragging = false;
-      let startX = 0, currentX = 0;
-
-      card.addEventListener("mousedown", (e) => {
-        isDragging = true;
-        startX = e.clientX;
-        card.style.transition = "none";
-      });
-
-      document.addEventListener("mousemove", (e) => {
-        if (!isDragging) return;
-        currentX = e.clientX - startX;
-        card.style.transform = `translateX(${currentX}px) rotate(${currentX / 15}deg)`;
-      });
-
-      document.addEventListener("mouseup", () => {
-        if (!isDragging) return;
-        isDragging = false;
-        card.style.transition = "transform 0.3s ease";
-
-        if (Math.abs(currentX) > 120) {
-          const direction = currentX > 0 ? "right" : "left";
-          card.style.transform = `translateX(${currentX * 4}px) rotate(${currentX / 2}deg)`;
-          setTimeout(() => handleSwipe(card, direction), 300);
-        } else {
-          card.style.transform = `translateX(0px) rotate(0deg)`;
-        }
-      });
-
-      // Touch support
-      card.addEventListener("touchstart", (e) => {
-        isDragging = true;
-        startX = e.touches[0].clientX;
-        card.style.transition = "none";
-      });
-
-      card.addEventListener("touchmove", (e) => {
-        if (!isDragging) return;
-        currentX = e.touches[0].clientX - startX;
-        card.style.transform = `translateX(${currentX}px) rotate(${currentX / 15}deg)`;
-      });
-
-      card.addEventListener("touchend", () => {
-        if (!isDragging) return;
-        isDragging = false;
-        card.style.transition = "transform 0.3s ease";
-
-        if (Math.abs(currentX) > 120) {
-          const direction = currentX > 0 ? "right" : "left";
-          card.style.transform = `translateX(${currentX * 4}px) rotate(${currentX / 2}deg)`;
-          setTimeout(() => handleSwipe(card, direction), 300);
-        } else {
-          card.style.transform = `translateX(0px) rotate(0deg)`;
-        }
-      });
+    #tinder {
+      position: relative;
+      width: 320px;
+      height: 480px;
     }
 
-    function handleSwipe(card, dir) {
-      const name = card.dataset.name;
-      const opinion = dir === "right" ? "like" : "dislike";
-      const data = {
-        name,
-        opinion,
-        timestamp: new Date().toISOString()
-      };
+    .card {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      background: white;
+      border-radius: 20px;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+      padding: 24px;
+      text-align: center;
+      cursor: grab;
+      transition: transform 0.3s ease, opacity 0.3s ease;
+      user-select: none;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 22px;
+      font-weight: bold;
+      color: #1A1A1A;
+    }
 
-      sendToSheet(data);
-      card.remove();
+    .end-message {
+      font-size: 20px;
+      color: #1A1A1A;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
 
-      if (!document.querySelector(".card")) {
-        tinder.innerHTML = `<div class="end-message">Thanks for swiping!</div>`;
+  <!-- 🔥 This is the card container -->
+  <div id="tinder"></div>
+
+  <script>
+    window.onload = () => {
+      const CSV_URL = 'https://raw.githubusercontent.com/fattonyio/zenvi-swipe/main/products_export_1.csv';
+      const SHEETDB_URL = 'https://sheetdb.io/api/v1/1ihsui12t3ue1';
+
+      const tinder = document.getElementById("tinder");
+
+      fetch(CSV_URL)
+        .then(res => res.text())
+        .then(csv => {
+          const rows = csv.trim().split('\n').slice(1); // Skip header
+          const titles = rows.map(row => {
+            const cols = row.split(/,(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)/);
+            return cols[1]; // Column 1 = "Title"
+          }).filter(title => title && title !== "Title");
+
+          loadCards(titles);
+        });
+
+      function loadCards(titles) {
+        titles.reverse().forEach((title, index) => {
+          const card = document.createElement("div");
+          card.className = "card";
+          card.dataset.id = index + 1;
+          card.dataset.name = title;
+          card.innerHTML = `${title}`;
+          tinder.appendChild(card);
+          addSwipeBehavior(card);
+        });
       }
-    }
 
-    function sendToSheet(data) {
-      fetch(SHEETDB_URL, {
-        method: "POST",
-        body: JSON.stringify({ data }),
-        headers: {
-          "Content-Type": "application/json"
+      function addSwipeBehavior(card) {
+        let isDragging = false;
+        let startX = 0, currentX = 0;
+
+        card.addEventListener("mousedown", (e) => {
+          isDragging = true;
+          startX = e.clientX;
+          card.style.transition = "none";
+        });
+
+        document.addEventListener("mousemove", (e) => {
+          if (!isDragging) return;
+          currentX = e.clientX - startX;
+          card.style.transform = `translateX(${currentX}px) rotate(${currentX / 15}deg)`;
+        });
+
+        document.addEventListener("mouseup", () => {
+          if (!isDragging) return;
+          isDragging = false;
+          card.style.transition = "transform 0.3s ease";
+
+          if (Math.abs(currentX) > 120) {
+            const direction = currentX > 0 ? "right" : "left";
+            card.style.transform = `translateX(${currentX * 4}px) rotate(${currentX / 2}deg)`;
+            setTimeout(() => handleSwipe(card, direction), 300);
+          } else {
+            card.style.transform = `translateX(0px) rotate(0deg)`;
+          }
+        });
+
+        // Touch support
+        card.addEventListener("touchstart", (e) => {
+          isDragging = true;
+          startX = e.touches[0].clientX;
+          card.style.transition = "none";
+        });
+
+        card.addEventListener("touchmove", (e) => {
+          if (!isDragging) return;
+          currentX = e.touches[0].clientX - startX;
+          card.style.transform = `translateX(${currentX}px) rotate(${currentX / 15}deg)`;
+        });
+
+        card.addEventListener("touchend", () => {
+          if (!isDragging) return;
+          isDragging = false;
+          card.style.transition = "transform 0.3s ease";
+
+          if (Math.abs(currentX) > 120) {
+            const direction = currentX > 0 ? "right" : "left";
+            card.style.transform = `translateX(${currentX * 4}px) rotate(${currentX / 2}deg)`;
+            setTimeout(() => handleSwipe(card, direction), 300);
+          } else {
+            card.style.transform = `translateX(0px) rotate(0deg)`;
+          }
+        });
+      }
+
+      function handleSwipe(card, dir) {
+        const name = card.dataset.name;
+        const opinion = dir === "right" ? "like" : "dislike";
+        const data = {
+          name,
+          opinion,
+          timestamp: new Date().toISOString()
+        };
+
+        sendToSheet(data);
+        card.remove();
+
+        if (!document.querySelector(".card")) {
+          tinder.innerHTML = `<div class="end-message">Thanks for swiping!<br>Check your Google Sheet 🕯️</div>`;
         }
-      })
-      .then(res => res.json())
-      .then(res => console.log("✅ Logged to SheetDB:", res))
-      .catch(err => console.error("❌ Error:", err));
-    }
+      }
 
-  };
-</script>
+      function sendToSheet(data) {
+        fetch(SHEETDB_URL, {
+          method: "POST",
+          body: JSON.stringify({ data }),
+          headers: {
+            "Content-Type": "application/json"
+          }
+        })
+        .then(res => res.json())
+        .then(res => console.log("✅ Logged to SheetDB:", res))
+        .catch(err => console.error("❌ Error:", err));
+      }
+    };
+  </script>
+
+</body>
+</html>
