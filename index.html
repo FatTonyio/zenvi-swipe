@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <title>Zenvi Gradient Swipe</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&family=Lobster&display=swap" rel="stylesheet" />
   <style>
     body {
@@ -18,8 +19,10 @@
 
     #tinder {
       position: relative;
-      width: 320px;
-      height: 480px;
+      width: 90vw;
+      max-width: 340px;
+      height: 80vh;
+      max-height: 520px;
     }
 
     .card {
@@ -40,16 +43,32 @@
     }
 
     .card h2 {
-      font-size: 24px;
+      font-size: 5vw;
+      max-width: 90%;
       margin-bottom: 16px;
     }
 
     .card p {
-      font-size: 15px;
-      max-width: 260px;
+      font-size: 3.7vw;
+      max-width: 90%;
       line-height: 1.4;
       color: #f0f0f0;
       margin: 0;
+    }
+
+    .labels {
+      position: absolute;
+      bottom: 12px;
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      padding: 0 20px;
+      font-family: 'Lobster', cursive;
+      font-size: 4vw;
+      color: #ffffffcc;
+      opacity: 0.9;
+      user-select: none;
+      pointer-events: none;
     }
 
     .card:last-child {
@@ -57,38 +76,20 @@
     }
 
     .end-message {
-      font-size: 20px;
+      font-size: 18px;
       color: #1A1A1A;
       text-align: center;
     }
 
-    .swipe-labels {
-      position: absolute;
-      bottom: 30px;
-      width: 320px;
-      display: flex;
-      justify-content: space-between;
-      padding: 0 24px;
-      font-family: 'Lobster', cursive;
-      font-size: 22px;
-      color: #1A1A1A;
-      opacity: 0.6;
-      user-select: none;
-      pointer-events: none;
-    }
-
-    .swipe-left {
-      text-align: left;
-    }
-
-    .swipe-right {
-      text-align: right;
-    }
-
-    @media (max-width: 400px) {
-      .swipe-labels {
+    @media (min-width: 480px) {
+      .card h2 {
+        font-size: 24px;
+      }
+      .card p {
+        font-size: 15px;
+      }
+      .labels {
         font-size: 20px;
-        bottom: 24px;
       }
     }
   </style>
@@ -96,10 +97,6 @@
 <body>
 
   <div id="tinder"></div>
-  <div class="swipe-labels">
-    <span class="swipe-left">👈 Scrap it</span>
-    <span class="swipe-right">Love it 👉</span>
-  </div>
 
 <script>
   const scents = [
@@ -141,7 +138,14 @@
     card.style.transform = `translateY(${i * 2}px)`;
     card.dataset.id = i + 1;
     card.dataset.name = scent.name;
-    card.innerHTML = `<h2>${scent.name}</h2><p>${scent.notes}</p>`;
+    card.innerHTML = `
+      <h2>${scent.name}</h2>
+      <p>${scent.notes}</p>
+      <div class="labels">
+        <span>👈 Scrap it</span>
+        <span>Love it 👉</span>
+      </div>
+    `;
     tinder.appendChild(card);
     addSwipeBehavior(card);
   });
@@ -166,7 +170,6 @@
       if (!isDragging) return;
       isDragging = false;
       card.style.transition = "transform 0.3s ease";
-
       if (Math.abs(currentX) > 120) {
         const direction = currentX > 0 ? "right" : "left";
         card.style.transform = `translateX(${currentX * 4}px) rotate(${currentX / 2}deg)`;
@@ -176,7 +179,6 @@
       }
     });
 
-    // Touch support
     card.addEventListener("touchstart", (e) => {
       isDragging = true;
       startX = e.touches[0].clientX;
@@ -193,8 +195,7 @@
       if (!isDragging) return;
       isDragging = false;
       card.style.transition = "transform 0.3s ease";
-
-      if (Math.abs(currentX) > 120) {
+      if (Math.abs(currentX) > 100) {
         const direction = currentX > 0 ? "right" : "left";
         card.style.transform = `translateX(${currentX * 4}px) rotate(${currentX / 2}deg)`;
         setTimeout(() => handleSwipe(card, direction), 300);
