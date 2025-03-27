@@ -62,26 +62,39 @@
       text-align: center;
     }
 
-    .label {
-      position: absolute;
-      top: 50%;
-      transform: translateY(-50%);
-      font-family: 'Lobster', cursive;
-      font-size: 32px;
-      color: #1A1A1A;
-      opacity: 0.2;
-      pointer-events: none;
-      user-select: none;
-    }
+.label {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  font-family: 'Lobster', cursive;
+  font-size: 28px;
+  color: #1A1A1A;
+  opacity: 0.15;
+  user-select: none;
+  pointer-events: none;
+  white-space: nowrap;
+  text-shadow: 0 0 4px rgba(255,255,255,0.2);
+}
 
-    .label.left {
-      left: -80px;
-      transform: rotate(-20deg) translateY(-50%);
-    }
+.label.left {
+  left: -60px;
+  transform: rotate(-15deg) translateY(-50%);
+}
 
-    .label.right {
-      right: -80px;
-      transform: rotate(20deg) translateY(-50%);
+.label.right {
+  right: -60px;
+  transform: rotate(15deg) translateY(-50%);
+}
+
+@media (max-width: 400px) {
+  .label.left {
+    left: -45px;
+  }
+  .label.right {
+    right: -45px;
+  }
+}
+ransform: rotate(20deg) translateY(-50%);
     }
   </style>
 </head>
