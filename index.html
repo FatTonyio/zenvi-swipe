@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <title>Zenvi Gradient Swipe</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&family=Lobster&display=swap" rel="stylesheet" />
   <style>
     body {
       margin: 0;
@@ -39,12 +39,6 @@
       user-select: none;
     }
 
-    .card h2,
-    .card p {
-      z-index: 1;
-      margin: 0;
-    }
-
     .card h2 {
       font-size: 24px;
       margin-bottom: 16px;
@@ -55,6 +49,7 @@
       max-width: 260px;
       line-height: 1.4;
       color: #f0f0f0;
+      margin: 0;
     }
 
     .card:last-child {
@@ -66,11 +61,35 @@
       color: #1A1A1A;
       text-align: center;
     }
+
+    .label {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      font-family: 'Lobster', cursive;
+      font-size: 32px;
+      color: #1A1A1A;
+      opacity: 0.2;
+      pointer-events: none;
+      user-select: none;
+    }
+
+    .label.left {
+      left: -80px;
+      transform: rotate(-20deg) translateY(-50%);
+    }
+
+    .label.right {
+      right: -80px;
+      transform: rotate(20deg) translateY(-50%);
+    }
   </style>
 </head>
 <body>
 
-<div id="tinder"></div>
+  <div class="label left">Scrap it</div>
+  <div class="label right">Love it</div>
+  <div id="tinder"></div>
 
 <script>
   const scents = [
