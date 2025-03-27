@@ -156,18 +156,19 @@
     }
   }
 
-  function sendToSheet(data) {
-    fetch("https://script.google.com/macros/s/AKfycbxuo22oBtgDJHzEfvdVmwueHi35NP3SUBIc0sBOGM4qRVh9jhqO3rAEl5oXF4EQwQA5rg/exec", {
-      method: "POST",
-      body: JSON.stringify(data),
-      headers: {
-        "Content-Type": "application/json"
-      }
-    })
-    .then(res => res.json())
-    .then(res => console.log("✅ Logged to Sheet:", res))
-    .catch(err => console.error("❌ Error:", err));
-  }
+function sendToSheet(data) {
+  fetch("https://corsproxy.io/?https://script.google.com/macros/s/AKfycbxuo22oBtgDJHzEfvdVmwueHi35NP3SUBIc0sBOGM4qRVh9jhqO3rAEl5oXF4EQwQA5rg/exec", {
+    method: "POST",
+    body: JSON.stringify(data),
+    headers: {
+      "Content-Type": "application/json"
+    }
+  })
+  .then(res => res.json())
+  .then(res => console.log("✅ Logged to Sheet:", res))
+  .catch(err => console.error("❌ Error:", err));
+}
+
 </script>
 
 </body>
